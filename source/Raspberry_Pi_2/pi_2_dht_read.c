@@ -20,6 +20,7 @@
 // SOFTWARE.
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "pi_2_dht_read.h"
 #include "pi_2_mmio.h"
@@ -42,7 +43,6 @@ int pi_2_dht_read(int type, int pin, float* humidity, float* temperature) {
   }
   *temperature = 0.0f;
   *humidity = 0.0f;
-
   // Initialize GPIO library.
   if (pi_2_mmio_init() < 0) {
     return DHT_ERROR_GPIO;
@@ -74,7 +74,6 @@ int pi_2_dht_read(int type, int pin, float* humidity, float* temperature) {
   // Need a very short delay before reading pins or else value is sometimes still low.
   for (volatile int i = 0; i < 50; ++i) {
   }
-
   // Wait for DHT to pull pin low.
   uint32_t count = 0;
   while (pi_2_mmio_input(pin)) {
@@ -84,7 +83,6 @@ int pi_2_dht_read(int type, int pin, float* humidity, float* temperature) {
       return DHT_ERROR_TIMEOUT;
     }
   }
-
   // Record pulse widths for the expected result bits.
   for (int i=0; i < DHT_PULSES*2; i+=2) {
     // Count how long pin is low and store in pulseCounts[i]
@@ -109,7 +107,6 @@ int pi_2_dht_read(int type, int pin, float* humidity, float* temperature) {
 
   // Drop back to normal priority.
   set_default_priority();
-
   // Compute the average low pulse width to use as a 50 microsecond reference threshold.
   // Ignore the first two readings because they are a constant 80 microsecond pulse.
   uint32_t threshold = 0;
@@ -133,7 +130,7 @@ int pi_2_dht_read(int type, int pin, float* humidity, float* temperature) {
   }
 
   // Useful debug info:
-  //printf("Data: 0x%x 0x%x 0x%x 0x%x 0x%x\n", data[0], data[1], data[2], data[3], data[4]);
+  // printf("Data: 0x%x 0x%x 0x%x 0x%x 0x%x\n", data[0], data[1], data[2], data[3], data[4]);
 
   // Verify checksum of received data.
   if (data[4] == ((data[0] + data[1] + data[2] + data[3]) & 0xFF)) {

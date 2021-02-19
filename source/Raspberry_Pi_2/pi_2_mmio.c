@@ -31,6 +31,7 @@
 #include "pi_2_mmio.h"
 
 #define GPIO_BASE_OFFSET 0x200000
+#define PERI_BASE 0x7e000000
 #define GPIO_LENGTH 4096
 
 volatile uint32_t* pi_2_mmio_gpio = NULL;
@@ -40,16 +41,20 @@ int pi_2_mmio_init(void) {
     // Check for GPIO and peripheral addresses from device tree.
     // Adapted from code in the RPi.GPIO library at:
     //   http://sourceforge.net/p/raspberry-gpio-python/
+    // This device tree method seems off now, not sure why but the base
+    // address didn't require the seek, hardcoding for now unless I can
+    // find documentation that says this is correct
     FILE *fp = fopen("/proc/device-tree/soc/ranges", "rb");
     if (fp == NULL) {
       return MMIO_ERROR_OFFSET;
     }
-    fseek(fp, 4, SEEK_SET);
+    //fseek(fp, 4, SEEK_SET);
     unsigned char buf[4];
     if (fread(buf, 1, sizeof(buf), fp) != sizeof(buf)) {
       return MMIO_ERROR_OFFSET;
     }
     uint32_t peri_base = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3] << 0;
+    peri_base = PERI_BASE;
     uint32_t gpio_base = peri_base + GPIO_BASE_OFFSET;
     fclose(fp);
 
