@@ -1,4 +1,4 @@
-Hack and slash working with pi4b and AM2302, though should probably use the supported libraries linked below.
+Hack and slash working with pi4b and AM2302 using Raspbian GNU/Linux 10, though should probably use the supported libraries linked below.
 
 *DEPRECATED LIBRARY* Adafruit Python DHT Sensor Library
 =======================
